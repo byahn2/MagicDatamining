@@ -11,7 +11,8 @@ Goal of the Analysis:
 Our goal is to create a model that can classify each item in the dataset as caused by gamma radiation or cosmic rays.  This is a supervised learning classification task.
 
 Planned Technical Approach
-1.Data Visualization
+
+1 Data Visualization
 We will first familiarize ourselves with the data and attempt to visualize it, which will mostly involve plotting distributions of the various attributes, as well as looking at correlations. There are many attributes, and having a relative understanding of the underlying distributions of these attributes may help us tune our methods to better fit our data (such as picking the right kernel). We may also want to visualize some of the particle collisions, if that becomes necessary.
 
 2 Data Preprocessing
