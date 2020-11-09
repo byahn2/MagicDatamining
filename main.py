@@ -21,9 +21,9 @@ def preprocess(raw_data):
     target = raw_data[target_index]
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
-    #normalize all attributes
+    #normalize all attributes (may change how we do this)
     print(attributes.shape)
-    for i in attributes.shape[1]:
+    for i in range(attributes.shape[1]):
         col = attributes[i]
         col_normalized = (col - col.min()) / (col.max() - col.min())
         attributes[i] = col_normalized
@@ -50,7 +50,7 @@ def evaluate(bayes_results, svm_results, X_test, y_test):
 #signed distance from hyperplane for SVM? pg 554
 
 def main():
-    filename = "magic.data"
+    filename = "magic04.data"
     magic = pd.read_csv(filename, header=None, skipinitialspace=True)
     visualize_data(magic)
     X, X_test, y, y_test = preprocess(magic)
