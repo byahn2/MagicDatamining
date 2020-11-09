@@ -21,7 +21,17 @@ def preprocess(raw_data):
     target = raw_data[target_index]
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
+    #normalize all attributes
+    print(attributes.shape)
+    for i in attributes.shape[1]:
+        col = attributes[i]
+        col_normalized = (col - col.min()) / (col.max() - col.min())
+        attributes[i] = col_normalized
+
+    #split data into train and test set
     X_train, X_test, y_train, y_test = train_test_split(attributes, target, test_size=0.25, shuffle=True)
+    return X_train, X_test, y_train, y_test
+
 
 
 
@@ -33,17 +43,21 @@ def run_SVM(X,y):
     print('run SVM')
 
 #EVAL
-def evaluate(bayes_results, svm_results, test_X, test_y):
+def evaluate(bayes_results, svm_results, X_test, y_test):
     print('evaluate')
 #area under ROC for comparing them to eachother
 #posterior probability for Bayes?
 #signed distance from hyperplane for SVM? pg 554
 
-if __name__ == '__main__':
+def main():
     filename = "magic.data"
     magic = pd.read_csv(filename, header=None, skipinitialspace=True)
     visualize_data(magic)
-    X, y, test_X, test_y = preprocess(magic)
+    X, X_test, y, y_test = preprocess(magic)
     bayes_results = run_bayes(X,y)
     svm_results = run_SVM(X,y)
-    evaluate(bayes_results, svm_results, test_X, test_y)
+    evaluate(bayes_results, svm_results, X_test, y_test)
+
+if __name__ == '__main__':
+    main()
+
