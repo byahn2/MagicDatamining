@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, scale
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
@@ -10,12 +10,6 @@ from sklearn import svm
 #Jeremy will be responsible for: visualization, coding/running Bayes.
 #We will both be contributing to the presentation, report, proofreading, checking, helping each other debug.
 
-#DATA VISUALIZATION
-def visualize_data(data):
-    print('data visualization')
-#plotting distributions of the various attributes
-#correlations
-
 #DATA PREPROCESSING
 def preprocess(raw_data):
     # split into target and attributes
@@ -25,10 +19,7 @@ def preprocess(raw_data):
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
     #normalize all attributes (may change how we do this)
-    for i in range(attributes.shape[1]):
-        col = attributes[i]
-        col_normalized = (col - col.min()) / (col.max() - col.min())
-        attributes[i] = col_normalized
+    attributes = scale(attributes)
     #split data into train and test set .25 to .75
     X_train, X_test, y_train, y_test = train_test_split(attributes, target, test_size=0.25, shuffle=True)
     return X_train, X_test, y_train, y_test
@@ -40,6 +31,7 @@ def run_bayes(X,y):
 def run_SVM(X,y):
     print('run SVM')
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
+    # https://scikit-learn.org/stable/modules/svm.html#svm-kernels
     # I'm going to look more into the details of how this works and what parameters I can use
     clf = svm.SVC()
     clf.fit(X, y)
@@ -57,7 +49,6 @@ def evaluate(bayes_model, svm_model, X_test, y_test):
 def main():
     filename = "magic04.data"
     magic = pd.read_csv(filename, header=None, skipinitialspace=True)
-    visualize_data(magic)
     X, X_test, y, y_test = preprocess(magic)
     bayes_model = run_bayes(X,y)
     svm_model = run_SVM(X,y)
