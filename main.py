@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder, scale
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn import svm
+from sklearn import svm, metrics
 
 
 
@@ -18,6 +18,7 @@ def preprocess(raw_data):
     target = raw_data[target_index]
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
+    # gamma = 0, hadron = 1
     #normalize all attributes (may change how we do this)
     attributes = scale(attributes)
     #split data into train and test set .25 to .75
@@ -30,17 +31,24 @@ def run_bayes(X,y):
 #Run SVM
 def run_SVM(X,y):
     print('run SVM')
+    y[y == 0] = -1
+    # gamma = -1, hadron = 1
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
     # https://scikit-learn.org/stable/modules/svm.html#svm-kernels
     # I'm going to look more into the details of how this works and what parameters I can use
-    clf = svm.SVC()
+    # kernel can be linear, polynomial, rbf, or sigmoid
+    clf = svm.SVC(C=1, kernel='rbf', gamma='scale')
     clf.fit(X, y)
     return clf
 
 #EVAL
-def evaluate(bayes_model, svm_model, X_test, y_test):
+def evaluate(bayes_model, svm_model, X, y):
     print('evaluate')
-    svm_result = svm_model.predict(X_test)
+    y_svm = y.copy()
+    y_svm[y_svm == 0] = -1
+    svm_result = svm_model.predict(X)
+    auc_svm = metrics.roc_auc_score(y_svm, svm_result)
+    print(auc_svm)
 
 #area under ROC for comparing them to eachother
 #posterior probability for Bayes?
