@@ -88,17 +88,24 @@ def run_SVM(X,y):
     return clf
 
 #EVAL
-def evaluate(bayes_model, svm_model, X, y):
+def evaluate(nb_model, svm_model, X, y):
+    #https: // machinelearningmastery.com / roc - curves - and -precision - recall - curves -for -imbalanced - classification /
     #print('evaluate Naive Bayes')
     print('evaluate SVM')
     y_svm = y.copy()
     y_svm[y_svm == 0] = -1
     svm_result = svm_model.predict(X)
     auc_svm = metrics.roc_auc_score(y_svm, svm_result)
+    precision_svm, recall_svm, _ = metrics.precision_recall_curve(y_svm, svm_result) #double check
+    pr_auc_svm = metrics.auc(recall_svm, precision_svm)
     print('Area under ROC curve for SVM: ', auc_svm)
-    bayes_result = bayes_model.predict(X)
-    auc_bayes = metrics.roc_auc_score(y, bayes_result)
-    print('Area under ROC curve for Bayes: ', auc_bayes)
+    print('Area under Precision-Recall curve for SVM: ', pr_auc_svm)
+    nb_result = nb_model.predict(X)
+    auc_bayes = metrics.roc_auc_score(y, nb_result)
+    precision_nb, recall_nb, _ = metrics.precision_recall_curve(y, nb_result) #double check
+    pr_auc_nb = metrics.auc(recall_nb, precision_nb)
+    print('\nArea under ROC curve for NB: ', auc_bayes)
+    print('Area under Precision-Recall curve for NB: ', pr_auc_nb)
 
 #area under ROC for comparing them to eachother
 #posterior probability for Bayes?
