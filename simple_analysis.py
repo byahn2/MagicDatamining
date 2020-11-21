@@ -1,10 +1,9 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder, scale, PowerTransformer
+from sklearn.preprocessing import LabelEncoder, scale
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm, metrics
-from scipy.stats import cauchy, skew
+from scipy.stats import cauchy
 
 
 
@@ -14,60 +13,18 @@ from scipy.stats import cauchy, skew
 
 #DATA PREPROCESSING
 def preprocess(raw_data):
-    """
-    raw_data: raw dataframe imported from csv
-    """
     # split into target and attributes
     target_index = len(raw_data.columns)-1
     attributes = raw_data.drop(target_index, axis=1)
     target = raw_data[target_index]
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
-    """
     # gamma = 0, hadron = 1
-    norm_att = [0,1,2,3,4,5,6,7,8]
-    cauchy_att = [9]
     #normalize all attributes (may change how we do this)
-    attributes[norm_att] = scale(attributes[norm_att])
-    attributes[cauchy_att] = cauchy.pdf(attributes[cauchy_att], 0, 1)
-    """
+    attributes = scale(attributes)
     #split data into train and test set .25 to .75
     X_train, X_test, y_train, y_test = train_test_split(attributes, target, test_size=0.25, shuffle=True)
     return X_train, X_test, y_train, y_test
-
-    
-
-def scale(attr_df):
-    """
-    attr_df: dataframe containing only attributes
-    """
-    skew_threshold = 0.5
-
-    # work out which attributes are skewed
-    nonskewed_cols = []
-    for col in xdf.columns:
-        thisskew = skew(xdf[col])
-        #print(col, thisskew)
-        if np.abs(thisskew) < skew_threshold:
-            nonskewed_cols.append(col)
-    nonskewed_cols.append["fAlpha"] # drop the fAlpha because it's weird
-    skew_xdf = xdf.drop(nonskewed_cols, axis=1) # this df contains only the skewed attributes
-
-    # do the actual unskew
-    pt = PowerTransformer(method="yeo-johnson", standardize=True)
-    unskew_xdf = pd.DataFrame(
-        pt.fit_transform(skew_xdf),
-        columns=skew_xdf.columns,
-    )
-
-    # remerge dataframes
-    skewed_cols = [col for col in xdf.columns if col not in nonskewed_cols]
-    nonskew_xdf = xdf.drop(skewed_cols, axis=1)
-
-    #TODO: merge unskew_xdf and nonskew_xdf back into a single dataframe
-
-    #TODO: work out what to do with "fAlpha" (powerlaw? KDE? see work in nb notebook)
-
 
 #Run Naive Bayes
 def run_bayes(X,y):
@@ -114,4 +71,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
