@@ -20,11 +20,8 @@ def preprocess(raw_data):
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
     # gamma = 0, hadron = 1
-    norm_att = [0,1,2,3,4,5,6,7,8]
-    cauchy_att = [9]
     #normalize all attributes (may change how we do this)
-    attributes[norm_att] = scale(attributes[norm_att])
-    attributes[cauchy_att] = cauchy.pdf(attributes[cauchy_att], 0, 1)
+    attributes = scale(attributes)
     #split data into train and test set .25 to .75
     X_train, X_test, y_train, y_test = train_test_split(attributes, target, test_size=0.25, shuffle=True)
     return X_train, X_test, y_train, y_test
