@@ -91,7 +91,7 @@ def run_SVM(X,y):
     # gamma = -1, hadron = 1
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
     # https://scikit-learn.org/stable/modules/svm.html#svm-kernels
-    clf = svm.SVC(C=60, kernel='rbf', gamma='scale')
+    clf = svm.SVC(C=60, random_state=0, kernel='rbf', gamma='scale')
     clf.fit(X, y)
     return clf
 
@@ -110,6 +110,12 @@ def evaluate(nb_model, svm_model, X, y):
 
     nb_result = nb_model.predict_proba(X)[:,1]
     svm_result = svm_model.decision_function(X)
+    svm_accuracy = metrics.accuracy_score(y_svm, svm_model.predict(X))
+    nb_accuracy = metrics.accuracy_score(y, nb_model.predict(X))
+    svm_f1 = metrics.f1_score(y_svm, svm_model.predict(X))
+    nb_f1 = metrics.f1_score(y, nb_model.predict(X))
+    print('NB Accuracy: ', nb_accuracy, ' SVM Accuracy: ', svm_accuracy)
+    print('NB F1: ', nb_f1, ' SVM F1: ', svm_f1)
     for result, yvals, label in [(nb_result, y, "NB"), (svm_result, y_svm, "SVM")]:
         fpr, tpr, _ = metrics.roc_curve(yvals, result)
         auc = metrics.roc_auc_score(yvals, result)
