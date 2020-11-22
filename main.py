@@ -127,9 +127,9 @@ def evaluate(nb_model, svm_model, X, y):
             ax.set(xlabel=xaxis, ylabel=yaxis)
 
     # reverse legend order
-    for ax in [rocax, prax]:
+    for ax, loc in [(rocax, "lower right"), (prax, "lower left")]:
         handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles[::-1], labels[::-1], loc="lower right")
+        ax.legend(handles[::-1], labels[::-1], loc=loc)
 
 
     rocfig.savefig("rocfig.png", dpi=300)
