@@ -66,9 +66,11 @@ def scale(attr_df):
     skewed_cols = [col for col in xdf.columns if col not in nonskewed_cols]
     nonskew_xdf = xdf.drop(skewed_cols, axis=1)
 
-    #TODO: merge unskew_xdf and nonskew_xdf back into a single dataframe
+    merged_df = pd.concat([nonskew_df, unskew_df], axis=1)
 
     #TODO: work out what to do with "fAlpha" (powerlaw? KDE? see work in nb notebook)
+    # for now nothing haha
+    return merged_df
 
 
 #Run Naive Bayes
