@@ -53,7 +53,6 @@ def scale(attr_df):
         if np.abs(thisskew) < skew_threshold:
             nonskewed_cols.append(col)
     nonskewed_cols.append("fAlpha") # drop the fAlpha because it's weird
-    print(attr_df.columns)
     skew_xdf = attr_df.drop(nonskewed_cols, axis=1) # this df contains only the skewed attributes
 
     # do the actual unskew
@@ -98,6 +97,43 @@ def evaluate(nb_model, svm_model, X, y):
     #print('evaluate Naive Bayes')
     y_svm = y.copy()
     y_svm[y_svm == 0] = -1
+
+    pad = 2
+    rocfig, rocax = plt.subplots()
+    plt.tight_layout(pad=pad)
+    prfig, prax = plt.subplots()
+    plt.tight_layout(pad=pad)
+
+    nb_result = nb_model.predict_proba(X)[:,1]
+    svm_result = svm_model.decision_function(X)
+    for result, yvals, label in [(nb_result, y, "NB"), (svm_result, y_svm, "SVM")]:
+        fpr, tpr, _ = metrics.roc_curve(yvals, result)
+        auc = metrics.roc_auc_score(yvals, result)
+        precision, recall, _ = metrics.precision_recall_curve(yvals, result)
+        pr_auc = metrics.auc(recall, precision)
+        print(f'Area under ROC curve for {label}: ', auc)
+        print(f'Area under Precision-Recall curve for {label}: ', pr_auc)
+        print("\n")
+
+        for ax, curve_label, xaxis, yaxis in [
+                (rocax, "ROC", "False Positive Rate", "True Positive Rate"),
+                (prax, "PR", "Precision", "Recall"),
+                ]:
+            ax.plot(fpr, tpr, marker='.', label=f'{label} (AUC = {auc:.2f})')
+            ax.set_title(f'{curve_label} curves')
+            ax.set(xlabel=xaxis, ylabel=yaxis)
+
+    # reverse legend order
+    for ax in [rocax, prax]:
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1], loc="lower right")
+
+
+    rocfig.savefig("rocfig.png", dpi=300)
+    prfig.savefig("prfig.png", dpi=300)
+
+
+    """
     svm_result = svm_model.decision_function(X)
     fpr_svm, tpr_svm, _ = metrics.roc_curve(y_svm, svm_result)
     auc_svm = metrics.roc_auc_score(y_svm, svm_result)
@@ -132,6 +168,7 @@ def evaluate(nb_model, svm_model, X, y):
     axs[1,1].set(xlabel='Precision', ylabel='Recall')
     axs[1,1].legend(loc='lower left')
     plt.show()
+    """
 
 #area under ROC for comparing them to eachother
 #posterior probability for Bayes?
