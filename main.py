@@ -87,7 +87,7 @@ def run_SVM(X,y):
     # gamma = -1, hadron = 1
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
     # https://scikit-learn.org/stable/modules/svm.html#svm-kernels
-    clf = svm.SVC(C=1, kernel='rbf', gamma='scale')
+    clf = svm.SVC(C=60, random_state=0, kernel='rbf', gamma='scale')
     clf.fit(X, y)
     return clf
 
