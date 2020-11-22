@@ -20,9 +20,8 @@ def preprocess(raw_data):
     raw_data: raw dataframe imported from csv
     """
     # split into target and attributes
-    target_index = len(raw_data.columns)-1
-    attributes = raw_data.drop(target_index, axis=1)
-    target = raw_data[target_index]
+    attributes = raw_data.drop("class", axis=1)
+    target = raw_data["class"]
     # Change target to a binary classification
     target = LabelEncoder().fit_transform(target)
     """
@@ -33,8 +32,9 @@ def preprocess(raw_data):
     attributes[norm_att] = scale(attributes[norm_att])
     attributes[cauchy_att] = cauchy.pdf(attributes[cauchy_att], 0, 1)
     """
+    rescaled_df = scale(attributes)
     #split data into train and test set .25 to .75
-    X_train, X_test, y_train, y_test = train_test_split(attributes, target, test_size=0.25, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(rescaled_df, target, test_size=0.25, shuffle=True)
     return X_train, X_test, y_train, y_test
 
     
@@ -47,13 +47,14 @@ def scale(attr_df):
 
     # work out which attributes are skewed
     nonskewed_cols = []
-    for col in xdf.columns:
-        thisskew = skew(xdf[col])
+    for col in attr_df.columns:
+        thisskew = skew(attr_df[col])
         #print(col, thisskew)
         if np.abs(thisskew) < skew_threshold:
             nonskewed_cols.append(col)
-    nonskewed_cols.append["fAlpha"] # drop the fAlpha because it's weird
-    skew_xdf = xdf.drop(nonskewed_cols, axis=1) # this df contains only the skewed attributes
+    nonskewed_cols.append("fAlpha") # drop the fAlpha because it's weird
+    print(attr_df.columns)
+    skew_xdf = attr_df.drop(nonskewed_cols, axis=1) # this df contains only the skewed attributes
 
     # do the actual unskew
     pt = PowerTransformer(method="yeo-johnson", standardize=True)
@@ -63,10 +64,10 @@ def scale(attr_df):
     )
 
     # remerge dataframes
-    skewed_cols = [col for col in xdf.columns if col not in nonskewed_cols]
-    nonskew_xdf = xdf.drop(skewed_cols, axis=1)
+    skewed_cols = [col for col in attr_df.columns if col not in nonskewed_cols]
+    nonskew_xdf = attr_df.drop(skewed_cols, axis=1)
 
-    merged_df = pd.concat([nonskew_df, unskew_df], axis=1)
+    merged_df = pd.concat([nonskew_xdf, unskew_xdf], axis=1)
 
     #TODO: work out what to do with "fAlpha" (powerlaw? KDE? see work in nb notebook)
     # for now nothing haha
@@ -138,7 +139,20 @@ def evaluate(nb_model, svm_model, X, y):
 
 def main():
     filename = "magic04.data"
-    magic = pd.read_csv(filename, header=None, skipinitialspace=True)
+    cols = (
+        "fLength",
+        "fWidth",
+        "fSize",
+        "fConc",
+        "fConc1",
+        "fAsym",
+        "fM3Long",
+        "fM3Trans",
+        "fAlpha",
+        "fDist",
+        "class",
+    )
+    magic = pd.read_csv(filename, header=None, skipinitialspace=True, names=cols)
     X, X_test, y, y_test = preprocess(magic)
     bayes_model = run_bayes(X,y)
     svm_model = run_SVM(X,y)
