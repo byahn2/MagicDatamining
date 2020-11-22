@@ -102,14 +102,13 @@ def evaluate(nb_model, svm_model, X, y):
     auc_svm = metrics.roc_auc_score(y_svm, svm_result)
     precision_svm, recall_svm, _ = metrics.precision_recall_curve(y_svm, svm_result)
     pr_auc_svm = metrics.auc(recall_svm, precision_svm)
-    print(precision_svm)
     print('Area under ROC curve for SVM: ', auc_svm)
     print('Area under Precision-Recall curve for SVM: ', pr_auc_svm)
 
-    nb_result = nb_model.predict(X)
-    fpr_nb, tpr_nb, _ = metrics.roc_curve(y, nb_result)
-    auc_nb = metrics.roc_auc_score(y, nb_result)
-    precision_nb, recall_nb, _ = metrics.precision_recall_curve(y, nb_result) #double check
+    nb_result = nb_model.predict_proba(X)
+    fpr_nb, tpr_nb, _ = metrics.roc_curve(y, nb_result[:,1])
+    auc_nb = metrics.roc_auc_score(y, nb_result[:,1])
+    precision_nb, recall_nb, _ = metrics.precision_recall_curve(y, nb_result[:,1])
     pr_auc_nb = metrics.auc(recall_nb, precision_nb)
     print('\nArea under ROC curve for NB: ', auc_nb)
     print('Area under Precision-Recall curve for NB: ', pr_auc_nb)
