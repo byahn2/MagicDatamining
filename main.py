@@ -119,7 +119,10 @@ def evaluate(nb_model, svm_model, X, y):
                 (rocax, "ROC", "False Positive Rate", "True Positive Rate"),
                 (prax, "PR", "Precision", "Recall"),
                 ]:
-            ax.plot(fpr, tpr, marker='.', label=f'{label} (AUC = {auc:.2f})')
+            if curve_label == "ROC":
+                ax.plot(fpr, tpr, marker='.', label=f'{label} (AUC = {auc:.2f})')
+            else:
+                ax.plot(precision, recall, marker='.', label=f'{label} (AUC = {pr_auc:.2f})')
             ax.set_title(f'{curve_label} curves')
             ax.set(xlabel=xaxis, ylabel=yaxis)
 
