@@ -15,7 +15,7 @@ from scipy.stats import cauchy, skew
 #We will both be contributing to the presentation, report, proofreading, checking, helping each other debug.
 
 #DATA PREPROCESSING
-def preprocess(raw_data):
+def preprocess(raw_data, scalepls=True):
     """
     raw_data: raw dataframe imported from csv
     """
@@ -32,7 +32,11 @@ def preprocess(raw_data):
     attributes[norm_att] = scale(attributes[norm_att])
     attributes[cauchy_att] = cauchy.pdf(attributes[cauchy_att], 0, 1)
     """
-    rescaled_df = scale(attributes)
+    rescaled_df = None
+    if scalepls:
+        rescaled_df = scale(attributes)
+    else:
+        rescaled_df = attributes
     #split data into train and test set .25 to .75
     X_train, X_test, y_train, y_test = train_test_split(rescaled_df, target, test_size=0.25, shuffle=True)
     return X_train, X_test, y_train, y_test
@@ -193,7 +197,8 @@ def main():
         "class",
     )
     magic = pd.read_csv(filename, header=None, skipinitialspace=True, names=cols)
-    X, X_test, y, y_test = preprocess(magic)
+    X_sc, X_test_sc, y_sc, y_test_sc = preprocess(magic)
+    X, X_test, y, y_test = preprocess(magic, scalepls=False)
     bayes_model = run_bayes(X,y)
     svm_model = run_SVM(X,y)
     evaluate(bayes_model, svm_model, X_test, y_test)
