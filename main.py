@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, scale, PowerTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm, metrics
 from scipy.stats import cauchy, skew
+
 
 
 
@@ -95,17 +97,40 @@ def evaluate(nb_model, svm_model, X, y):
     y_svm = y.copy()
     y_svm[y_svm == 0] = -1
     svm_result = svm_model.predict(X)
+    fpr_svm, tpr_svm, _ = metrics.roc_curve(y_svm, svm_result)
     auc_svm = metrics.roc_auc_score(y_svm, svm_result)
     precision_svm, recall_svm, _ = metrics.precision_recall_curve(y_svm, svm_result) #double check
     pr_auc_svm = metrics.auc(recall_svm, precision_svm)
+    print(precision_svm)
     print('Area under ROC curve for SVM: ', auc_svm)
     print('Area under Precision-Recall curve for SVM: ', pr_auc_svm)
+
     nb_result = nb_model.predict(X)
-    auc_bayes = metrics.roc_auc_score(y, nb_result)
+    fpr_nb, tpr_nb, _ = metrics.roc_curve(y, nb_result)
+    auc_nb = metrics.roc_auc_score(y, nb_result)
     precision_nb, recall_nb, _ = metrics.precision_recall_curve(y, nb_result) #double check
     pr_auc_nb = metrics.auc(recall_nb, precision_nb)
-    print('\nArea under ROC curve for NB: ', auc_bayes)
+    print('\nArea under ROC curve for NB: ', auc_nb)
     print('Area under Precision-Recall curve for NB: ', pr_auc_nb)
+
+    fig, axs = plt.subplots(2,2)
+    axs[0,0].plot(fpr_nb, tpr_nb, marker='.', label='ROC AUC = %0.2f' % auc_nb)
+    axs[0,0].set_title('ROC curve for NB')
+    axs[0,0].set(xlabel='False Positive Rate', ylabel='True Positive Rate')
+    axs[0,0].legend(loc='lower right')
+    axs[0,1].plot(fpr_svm, tpr_svm, marker='.', label='ROC AUC = %0.2f' % auc_svm)
+    axs[0,1].set_title('ROC curve for SVM')
+    axs[0,1].set(xlabel='False Positive Rate', ylabel='True Positive Rate')
+    axs[0,1].legend(loc='lower right')
+    axs[1,0].plot(precision_nb, recall_nb, marker='.', label='PR AUC = %0.2f' % pr_auc_nb)
+    axs[1,0].set_title('P-R curve for NB')
+    axs[1,0].set(xlabel='Precision', ylabel='Recall')
+    axs[1,0].legend(loc='lower left')
+    axs[1,1].plot(precision_svm, recall_svm, marker='.', label='PR AUC = %0.2f' % pr_auc_svm)
+    axs[1,1].set_title('P-R curve for SVM')
+    axs[1,1].set(xlabel='Precision', ylabel='Recall')
+    axs[1,1].legend(loc='lower left')
+    plt.show()
 
 #area under ROC for comparing them to eachother
 #posterior probability for Bayes?
