@@ -93,13 +93,12 @@ def run_SVM(X,y):
 def evaluate(nb_model, svm_model, X, y):
     #https: // machinelearningmastery.com / roc - curves - and -precision - recall - curves -for -imbalanced - classification /
     #print('evaluate Naive Bayes')
-    print('evaluate SVM')
     y_svm = y.copy()
     y_svm[y_svm == 0] = -1
-    svm_result = svm_model.predict(X)
+    svm_result = svm_model.decision_function(X)
     fpr_svm, tpr_svm, _ = metrics.roc_curve(y_svm, svm_result)
     auc_svm = metrics.roc_auc_score(y_svm, svm_result)
-    precision_svm, recall_svm, _ = metrics.precision_recall_curve(y_svm, svm_result) #double check
+    precision_svm, recall_svm, _ = metrics.precision_recall_curve(y_svm, svm_result)
     pr_auc_svm = metrics.auc(recall_svm, precision_svm)
     print(precision_svm)
     print('Area under ROC curve for SVM: ', auc_svm)
